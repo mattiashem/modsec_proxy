@@ -34,10 +34,10 @@ SecRule USER:someuidcounter "@gt 60" "phase:2,pause:300,log,id:13,msg:'Sleeping'
 
 SecAction initcol:ip=%{REMOTE_ADDR},pass,nolog,id:20
 SecAction "phase:5,deprecatevar:ip.counter=1/1,pass,nolog,id:21"
-SecRule IP:COUNTER "@gt 1" "phase:2,pause:300,log,pass,msg:'Ratelimit hit sleep',id:22"
+SecRule IP:COUNTER "@gt 60" "phase:2,pause:300,log,pass,msg:'Ratelimit hit sleep',id:22"
 SecAction "phase:2,pass,setvar:ip.counter=+1,nolog,id:23"
 
-SecRule IP:COUNTER "@gt 30" "phase:2,deny,status:509,msg:'Block rate limit 509',id:32"
+SecRule IP:COUNTER "@gt 90" "phase:2,deny,status:509,msg:'Block rate limit 509',id:32"
 
 
 
