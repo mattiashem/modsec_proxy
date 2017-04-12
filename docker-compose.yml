@@ -1,0 +1,8 @@
+version: '2'
+services:
+  mod_proxy:
+    build: .
+    ports:
+      - 80:80
+    volumes:
+      - ./conf.d/:/etc/httpd/conf.d/
