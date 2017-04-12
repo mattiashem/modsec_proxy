@@ -1,0 +1,43 @@
+
+
+#################################
+#
+# Rate limit based on uid set to server 
+#
+
+#Setup variable
+SecAction initcol:USER=%{ARGS.uid},id:10,pass,nolog
+
+#Deprecates the counter by 1 every 1 second. This is setting the base rate of our rate limit, one per second.
+SecAction "phase:5,deprecatevar:USER.someuidcounter=1/1,pass,nolog,id:11"
+
+#Add couting for request with uid args
+SecRule ARGS:uid "@rx ^.*" "phase:2,id:12,t:lowercase,pass,setvar:USER.someuidcounter=+1,msg:'Adding user count'"
+
+#Sleep request depening on request / sec
+SecRule USER:someuidcounter "@gt 60" "phase:2,pause:300,log,id:13,msg:'Sleeping'"
+
+
+
+
+
+
+
+
+##################################
+#
+# Rate limit based on IP connetings to server with sleep and block
+#
+# Any IP can do a burst of 60 requests as fast as it likes and it then limited to 1 per second. If it # makes no further requests for 60 seconds then the counter is decremented back to 0
+#
+# It cient ges over 90 request/sec block with 509
+
+SecAction initcol:ip=%{REMOTE_ADDR},pass,nolog,id:20
+SecAction "phase:5,deprecatevar:ip.counter=1/1,pass,nolog,id:21"
+SecRule IP:COUNTER "@gt 1" "phase:2,pause:300,log,pass,msg:'Ratelimit hit sleep',id:22"
+SecAction "phase:2,pass,setvar:ip.counter=+1,nolog,id:23"
+
+SecRule IP:COUNTER "@gt 30" "phase:2,deny,status:509,msg:'Block rate limit 509',id:32"
+
+
+
