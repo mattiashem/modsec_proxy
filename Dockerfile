@@ -7,4 +7,6 @@ RUN yum install httpd -y
 RUN yum install mod_security -y
 
 
-ADD proxy_pbk.conf /etc/httpd/conf.d/proxy_pbk.conf
+ADD start.sh /start.sh
+RUN chmod 700 /start.sh
+CMD ./start.sh
